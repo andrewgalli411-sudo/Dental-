@@ -8,6 +8,16 @@ from sqlalchemy.pool import StaticPool
 from app.models import Base
 
 
+@pytest.fixture(autouse=True)
+def _reset_login_limiter():
+    # The login limiter is a module singleton; keep failures from leaking across tests.
+    from app.security.ratelimit import login_limiter
+
+    login_limiter.reset()
+    yield
+    login_limiter.reset()
+
+
 @pytest.fixture
 def engine():
     eng = create_engine(

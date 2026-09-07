@@ -29,6 +29,7 @@ from app.security.auth import (
     verify_password,
     verify_totp,
 )
+from app.security.ratelimit import TooManyAttempts, login_limiter
 from app.services import delivery_service, verification_service
 from app.services.verification_service import WorkflowError
 from app.storage import ObjectStore, get_object_store
@@ -51,15 +52,28 @@ def login(
     session: Session = Depends(get_session),
     settings: Settings = Depends(get_settings),
 ) -> dict[str, str]:
+    key = body.email.lower()
+    try:
+        login_limiter.check(key)
+    except TooManyAttempts as exc:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="too many attempts — try again later",
+            headers={"Retry-After": str(exc.retry_after)},
+        ) from exc
+
     admin = session.scalar(select(AdminUser).where(AdminUser.email == body.email))
     # Same generic error whether the email is unknown or the secret is wrong.
     invalid = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials")
-    if admin is None or not admin.is_active:
+    if (
+        admin is None
+        or not admin.is_active
+        or not verify_password(admin.password_hash, body.password)
+        or not verify_totp(admin.totp_secret, body.totp)
+    ):
+        login_limiter.record_failure(key)
         raise invalid
-    if not verify_password(admin.password_hash, body.password):
-        raise invalid
-    if not verify_totp(admin.totp_secret, body.totp):
-        raise invalid
+    login_limiter.record_success(key)
 
     response.set_cookie(
         key=SESSION_COOKIE,
