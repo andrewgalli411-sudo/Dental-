@@ -31,6 +31,16 @@ class Settings(BaseSettings):
     # PHI retention.
     phi_retention_days: int = 7
 
+    # Admin session. MUST be overridden in every deployed env (from Secrets
+    # Manager). The default exists only so local dev runs.
+    session_secret: str = "dev-only-insecure-change-me"
+    session_ttl_hours: int = 12
+    # Cookie Secure flag off locally (http); on everywhere else.
+    cookie_secure: bool = False
+
+    # Public base URL, used to build secure links in emails.
+    public_base_url: str = "http://localhost:8000"
+
     @property
     def is_prod(self) -> bool:
         return self.environment == "prod"

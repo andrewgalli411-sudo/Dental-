@@ -48,6 +48,11 @@ class EligibilityRequest:
     provider_npi: str
     provider_tax_id: str
 
+    # Caller's handle to correlate the async result back to what was requested
+    # (here, the appointment id). In v2 this maps to the EDI 270 TRN trace number,
+    # which is how a 271 response is tied to its request.
+    correlation_id: str | None = None
+
     # Optional patient/subscriber identifiers.
     subscriber_id: str | None = None
     subscriber_name: str | None = None      # when patient is a dependent
@@ -104,7 +109,7 @@ class PendingVerification:
     """A submitted-but-unresolved verification, as tracked by a VerificationStore."""
 
     verification_id: str
-    request: EligibilityRequest
+    request: EligibilityRequest | None
     status: VerificationStatus = VerificationStatus.PENDING
     result: EligibilityResult | None = None
     missing_fields: list[str] = field(default_factory=list)

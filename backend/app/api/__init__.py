@@ -1,5 +1,5 @@
 """HTTP routers."""
 
-from . import upload
+from . import admin, upload
 
-__all__ = ["upload"]
+__all__ = ["admin", "upload"]

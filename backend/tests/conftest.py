@@ -54,3 +54,26 @@ def client(session_factory, tmp_path):
     app.dependency_overrides[get_object_store] = lambda: store
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+ADMIN_EMAIL = "founder@example.com"
+ADMIN_PASSWORD = "correct horse battery staple"
+
+
+@pytest.fixture
+def auth_client(client, session_factory):
+    """A TestClient already logged in as an admin (password + valid TOTP)."""
+    import pyotp
+
+    from app.security.auth import create_admin
+
+    with session_factory() as s:
+        admin, _uri = create_admin(s, ADMIN_EMAIL, ADMIN_PASSWORD)
+        secret = admin.totp_secret
+
+    resp = client.post(
+        "/admin/login",
+        json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD, "totp": pyotp.TOTP(secret).now()},
+    )
+    assert resp.status_code == 200, resp.text
+    return client

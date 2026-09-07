@@ -1,5 +1,6 @@
 """ORM models. Import all here so Alembic autogenerate sees the full metadata."""
 
+from .admin import AdminUser
 from .appointment import Appointment
 from .audit import AuditLog
 from .base import Base
@@ -12,6 +13,7 @@ from .verification import Verification
 
 __all__ = [
     "AccessToken",
+    "AdminUser",
     "Appointment",
     "AuditLog",
     "Base",

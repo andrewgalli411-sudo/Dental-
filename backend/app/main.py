@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
-from .api import upload
+from .api import admin, upload
 from .config import get_settings
 from .logging_config import configure_logging, get_logger
 
@@ -25,6 +25,7 @@ app = FastAPI(
 
 
 app.include_router(upload.router)
+app.include_router(admin.router)
 
 
 @app.get("/healthz")
