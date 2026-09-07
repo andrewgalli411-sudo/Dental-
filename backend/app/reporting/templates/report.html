@@ -4,50 +4,83 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Eligibility Report — {{ data.practice_name }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
+  /* Verifi UI Kit tokens — clinical, light-only. */
   :root {
-    --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --bg: #f8fafc;
-    --ok: #047857; --ok-bg: #ecfdf5; --warn: #b45309; --warn-bg: #fffbeb;
-    --bad: #b91c1c; --bad-bg: #fef2f2; --brand: #0e7490;
+    --bg:#F7F8FA; --surface:#FFFFFF; --surface-alt:#F2F4F7;
+    --border:#DFE3E8; --border-strong:#C3C9D2;
+    --ink:#1A2027; --ink-2:#49525D; --ink-3:#6B7480;
+    --accent:#2A5C8A;
+    --ok-ink:#0F7A52; --ok-bg:#E7F4EE; --ok-bd:#BFE3D0;
+    --bad-ink:#B42318; --bad-bg:#FCEBEA; --bad-bd:#F4C6C2;
+    --warn-ink:#B45309; --warn-bg:#FDF3E7; --warn-bd:#F5D9B0;
+    --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
   }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink);
-         font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  .sheet { max-width: 1100px; margin: 24px auto; background: #fff; padding: 32px 36px;
-           border: 1px solid var(--line); border-radius: 12px; }
-  header { display: flex; justify-content: space-between; align-items: baseline;
-           border-bottom: 2px solid var(--brand); padding-bottom: 16px; margin-bottom: 20px; }
-  h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
-  .practice { font-size: 15px; color: var(--muted); margin-top: 2px; }
-  .meta { text-align: right; color: var(--muted); font-size: 13px; }
-  .summary { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-  .stat { flex: 1; min-width: 130px; border: 1px solid var(--line); border-radius: 10px;
-          padding: 12px 14px; }
-  .stat .n { font-size: 22px; font-weight: 650; }
-  .stat .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
-       color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
-  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  tr:last-child td { border-bottom: none; }
-  .num { text-align: right; font-variant-numeric: tabular-nums; }
-  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px;
-          font-weight: 600; }
-  .pill.active { color: var(--ok); background: var(--ok-bg); }
-  .pill.inactive { color: var(--bad); background: var(--bad-bg); }
-  .pill.other { color: var(--warn); background: var(--warn-bg); }
-  .note { color: var(--warn); font-size: 12.5px; }
-  .name { font-weight: 600; }
-  .sub { color: var(--muted); font-size: 12px; }
-  footer { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line);
-           color: var(--muted); font-size: 12px; }
-  @media print {
-    body { background: #fff; }
-    .sheet { border: none; margin: 0; max-width: none; border-radius: 0; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .num{font-variant-numeric:tabular-nums;}
+  .sheet{max-width:1120px;margin:24px auto;background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  header{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:20px 24px;border-bottom:2px solid var(--ink);}
+  h1{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0;}
+  .practice{font-size:14px;color:var(--ink-2);margin-top:2px;}
+  .meta{text-align:right;color:var(--ink-3);font-size:13px;}
+  .meta strong{color:var(--ink);}
+  .summary{display:flex;gap:0;border-bottom:1px solid var(--border);}
+  .stat{flex:1;padding:14px 24px;border-right:1px solid var(--border);}
+  .stat:last-child{border-right:0;}
+  .stat .n{font-size:22px;font-weight:600;}
+  .stat .l{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;font-weight:600;}
+  .scroll{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--border-strong);white-space:nowrap;}
+  td{padding:0 12px;height:44px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tr:last-child td{border-bottom:0;}
+  th.r,td.r{text-align:right;}
+  tbody tr:nth-child(even){background:var(--surface-alt);}
+  .st-cell{border-left:3px solid transparent;padding-left:13px;}
+  tr.s-ok .st-cell{border-left-color:var(--ok-ink);}
+  tr.s-bad .st-cell{border-left-color:var(--bad-ink);}
+  tr.s-warn .st-cell{border-left-color:var(--warn-ink);}
+  .name{font-size:15px;font-weight:500;}
+  .sub{font-size:12px;color:var(--ink-3);}
+  .strong{font-weight:500;}
+  .mut{color:var(--ink-3);}
+  .flag{color:var(--warn-ink);font-size:13px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;line-height:1;padding:3px 8px;border-radius:3px;border:1px solid;white-space:nowrap;}
+  .badge svg{width:12px;height:12px;flex:none;}
+  .badge.ok{color:var(--ok-ink);background:var(--ok-bg);border-color:var(--ok-bd);}
+  .badge.bad{color:var(--bad-ink);background:var(--bad-bg);border-color:var(--bad-bd);}
+  .badge.warn{color:var(--warn-ink);background:var(--warn-bg);border-color:var(--warn-bd);}
+  footer{padding:14px 24px;border-top:1px solid var(--border);color:var(--ink-3);font-size:12px;}
+  @media print{
+    body{background:#fff;color:#000;}
+    .sheet{border:none;margin:0;max-width:none;border-radius:0;}
+    tbody tr:nth-child(even){background:transparent;}
+    .badge{background:transparent !important;border-color:#000 !important;color:#000 !important;font-weight:600;}
+    tr.s-bad td,tr.s-warn td{font-weight:600;}
+    .st-cell{border-left-color:#000 !important;}
+    .flag{color:#000;}
+    .summary,header{border-color:#000;}
   }
 </style>
 </head>
 <body>
+{% macro badge(status) -%}
+  {%- if status == "active" -%}
+    <span class="badge ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Active</span>
+  {%- elif status == "inactive" -%}
+    <span class="badge bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M7 7l10 10"/></svg>Inactive</span>
+  {%- else -%}
+    <span class="badge warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>{{ status|replace("_"," ")|title }}</span>
+  {%- endif -%}
+{%- endmacro %}
+{% macro rowclass(status) -%}
+  {%- if status == "active" -%}s-ok{%- elif status == "inactive" -%}s-bad{%- else -%}s-warn{%- endif -%}
+{%- endmacro %}
 <div class="sheet">
   <header>
     <div>
@@ -61,49 +94,44 @@
   </header>
 
   <div class="summary">
-    <div class="stat"><div class="n">{{ data.rows|length }}</div><div class="l">Patients</div></div>
-    <div class="stat"><div class="n">{{ data.verified_count }}</div><div class="l">Verified</div></div>
-    <div class="stat"><div class="n">{{ data.unverified_count }}</div><div class="l">Needs attention</div></div>
+    <div class="stat"><div class="n num">{{ data.rows|length }}</div><div class="l">Patients</div></div>
+    <div class="stat"><div class="n num">{{ data.verified_count }}</div><div class="l">Verified</div></div>
+    <div class="stat"><div class="n num">{{ data.unverified_count }}</div><div class="l">Needs attention</div></div>
   </div>
 
+  <div class="scroll">
   <table>
     <thead>
       <tr>
-        <th>Time</th><th>Patient</th><th>Payer / Plan</th><th>Status</th>
-        <th class="num">Annual max</th><th class="num">Remaining</th>
-        <th class="num">Deductible</th><th>Notes</th>
+        <th class="st-cell">Status</th><th>Time</th><th>Patient</th><th>Payer / Plan</th>
+        <th class="r">Annual max</th><th class="r">Remaining</th><th class="r">Deductible</th><th>Notes</th>
       </tr>
     </thead>
     <tbody>
     {% for r in data.rows %}
-      <tr>
-        <td>{{ r.appt_time or "—" }}</td>
+      <tr class="{{ rowclass(r.status) }}">
+        <td class="st-cell">{{ badge(r.status) }}</td>
+        <td class="num">{{ r.appt_time or "—" }}</td>
         <td>
           <div class="name">{{ r.patient_name }}</div>
-          {% if r.dob %}<div class="sub">DOB {{ r.dob.strftime("%m/%d/%Y") }}</div>{% endif %}
+          {% if r.dob %}<div class="sub num">DOB {{ r.dob.strftime("%m/%d/%Y") }}</div>{% endif %}
         </td>
         <td>{{ r.payer or "—" }}{% if r.plan %}<div class="sub">{{ r.plan }}</div>{% endif %}</td>
-        <td>
-          {% if r.status == "active" %}<span class="pill active">Active</span>
-          {% elif r.status == "inactive" %}<span class="pill inactive">Inactive</span>
-          {% else %}<span class="pill other">{{ r.status|replace("_", " ")|title }}</span>{% endif %}
+        <td class="r num">{{ r.annual_max|money }}</td>
+        <td class="r num strong">{{ r.remaining_benefit|money }}</td>
+        <td class="r num">
+          {% if r.deductible_total is not none %}{{ r.deductible_met|money }} / {{ r.deductible_total|money }}{% else %}<span class="mut">—</span>{% endif %}
         </td>
-        <td class="num">{{ r.annual_max|money }}</td>
-        <td class="num">{{ r.remaining_benefit|money }}</td>
-        <td class="num">
-          {% if r.deductible_total is not none %}
-            {{ r.deductible_met|money }} / {{ r.deductible_total|money }}
-          {% else %}—{% endif %}
-        </td>
-        <td>{% if not r.verified and r.note %}<span class="note">{{ r.note }}</span>{% else %}{{ r.note or "" }}{% endif %}</td>
+        <td>{% if not r.verified and r.note %}<span class="flag">{{ r.note }}</span>{% else %}<span class="mut">{{ r.note or "—" }}</span>{% endif %}</td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
+  </div>
 
   <footer>
-    Verified by verifi-dental. Confirm coverage at time of service; benefits quoted
-    are not a guarantee of payment. Contains PHI — handle per your practice's HIPAA policy.
+    Verified by verifi-dental. Confirm coverage at time of service; benefits quoted are not a
+    guarantee of payment. Contains PHI — handle per your practice&rsquo;s HIPAA policy.
   </footer>
 </div>
 </body>

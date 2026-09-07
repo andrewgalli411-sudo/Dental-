@@ -1,0 +1,593 @@
+<title>Verifi UI Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    /* Neutrals — cool-biased toward the accent, not pure grey */
+    --bg:            #F7F8FA;
+    --surface:       #FFFFFF;
+    --surface-alt:   #F2F4F7;   /* zebra / header fill */
+    --border:        #DFE3E8;
+    --border-strong: #C3C9D2;
+    --ink:           #1A2027;   /* primary text */
+    --ink-2:         #49525D;   /* secondary */
+    --ink-3:         #6B7480;   /* muted labels */
+
+    /* One calm accent — interactive only, never decorative */
+    --accent:        #2A5C8A;
+    --accent-hover:  #21496E;
+    --accent-weak:   #EAF0F6;   /* selected/hover row, focus bg */
+
+    /* Semantic status — meaning only; each = ink + tint + border */
+    --ok-ink:   #0F7A52; --ok-bg:   #E7F4EE; --ok-bd:   #BFE3D0;
+    --bad-ink:  #B42318; --bad-bg:  #FCEBEA; --bad-bd:  #F4C6C2;
+    --warn-ink: #B45309; --warn-bg: #FDF3E7; --warn-bd: #F5D9B0;
+    --mut-ink:  #49525D; --mut-bg:  #F2F4F7; --mut-bd:  #DFE3E8;
+
+    /* Type scale */
+    --fs-11:11px; --fs-12:12px; --fs-13:13px; --fs-14:14px; --fs-15:15px;
+    --fs-16:16px; --fs-18:18px; --fs-22:22px; --fs-28:28px;
+
+    /* Spacing (4px base) */
+    --s-2:2px; --s-4:4px; --s-6:6px; --s-8:8px; --s-12:12px; --s-16:16px;
+    --s-20:20px; --s-24:24px; --s-32:32px; --s-40:40px;
+
+    /* Radius — max 6px, no pills */
+    --r-sm:3px; --r-md:6px;
+
+    --sans:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    --mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); font-size: var(--fs-14); line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .num { font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: var(--s-40) var(--s-24) 96px; }
+
+  /* Masthead */
+  .mast { border-bottom: 2px solid var(--ink); padding-bottom: var(--s-16); margin-bottom: var(--s-32); }
+  .mast .kicker { font-size: var(--fs-11); letter-spacing: .08em; text-transform: uppercase;
+                  color: var(--ink-3); font-weight: 600; }
+  .mast h1 { font-size: var(--fs-28); font-weight: 600; letter-spacing: -.01em; margin: var(--s-6) 0 var(--s-4); }
+  .mast p { margin: 0; color: var(--ink-2); max-width: 62ch; }
+
+  section { margin-top: var(--s-40); }
+  .eyebrow { font-size: var(--fs-11); letter-spacing: .08em; text-transform: uppercase;
+             color: var(--accent); font-weight: 600; margin-bottom: var(--s-6); }
+  h2 { font-size: var(--fs-22); font-weight: 600; letter-spacing: -.01em; margin: 0 0 var(--s-6);
+       text-wrap: balance; }
+  h3 { font-size: var(--fs-16); font-weight: 600; margin: var(--s-24) 0 var(--s-12); }
+  .lede { color: var(--ink-2); max-width: 68ch; margin: 0 0 var(--s-20); }
+
+  /* Callout for reasoning / tradeoffs */
+  .note { border-left: 3px solid var(--border-strong); background: var(--surface);
+          padding: var(--s-12) var(--s-16); margin: var(--s-16) 0; border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+  .note.trade { border-left-color: var(--warn-ink); }
+  .note .lbl { font-size: var(--fs-11); letter-spacing: .06em; text-transform: uppercase;
+               font-weight: 600; color: var(--ink-3); }
+  .note.trade .lbl { color: var(--warn-ink); }
+  .note p { margin: var(--s-4) 0 0; color: var(--ink-2); max-width: 74ch; }
+
+  /* Panels holding live examples */
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md);
+           overflow: hidden; }
+  .panel + .panel { margin-top: var(--s-16); }
+  .panel-cap { font-size: var(--fs-12); color: var(--ink-3); padding: var(--s-8) var(--s-12);
+               border-bottom: 1px solid var(--border); background: var(--surface-alt); font-weight: 500; }
+  .pad { padding: var(--s-20); }
+
+  /* ---- Color swatches ---- */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--s-12); }
+  .sw { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
+  .sw .chip { height: 56px; border-bottom: 1px solid var(--border); }
+  .sw .meta { padding: var(--s-8) var(--s-12); }
+  .sw .name { font-weight: 500; font-size: var(--fs-13); }
+  .sw .hex { font-family: var(--mono); font-size: var(--fs-12); color: var(--ink-3); }
+  .sw .role { font-size: var(--fs-12); color: var(--ink-3); margin-top: var(--s-2); }
+
+  /* ---- Type scale ---- */
+  .type-row { display: grid; grid-template-columns: 96px 1fr; gap: var(--s-16); align-items: baseline;
+              padding: var(--s-12) 0; border-bottom: 1px solid var(--border); }
+  .type-row:last-child { border-bottom: 0; }
+  .type-row .k { font-family: var(--mono); font-size: var(--fs-12); color: var(--ink-3); }
+
+  /* ---- Spacing / radius ---- */
+  .scale { display: flex; flex-wrap: wrap; gap: var(--s-16); align-items: flex-end; }
+  .scale .u { text-align: center; }
+  .scale .bar { background: var(--accent-weak); border: 1px solid var(--accent); border-radius: 2px; }
+  .scale .u span { display: block; font-family: var(--mono); font-size: var(--fs-11); color: var(--ink-3); margin-top: var(--s-6); }
+  .radii { display: flex; gap: var(--s-16); }
+  .radii .r { width: 72px; height: 56px; background: var(--accent-weak); border: 1px solid var(--accent); }
+
+  /* ================= STATUS BADGE ================= */
+  .badge { display: inline-flex; align-items: center; gap: var(--s-6);
+           font-size: var(--fs-12); font-weight: 500; line-height: 1;
+           padding: 3px 8px; border-radius: var(--r-sm); border: 1px solid; white-space: nowrap; }
+  .badge svg { width: 12px; height: 12px; flex: none; }
+  .badge.ok   { color: var(--ok-ink);   background: var(--ok-bg);   border-color: var(--ok-bd); }
+  .badge.bad  { color: var(--bad-ink);  background: var(--bad-bg);  border-color: var(--bad-bd); }
+  .badge.warn { color: var(--warn-ink); background: var(--warn-bg); border-color: var(--warn-bd); }
+  .badge.mut  { color: var(--mut-ink);  background: var(--mut-bg);  border-color: var(--mut-bd); }
+  .badge-row { display: flex; gap: var(--s-12); flex-wrap: wrap; }
+
+  /* ================= REPORT TABLE ================= */
+  .tbl-scroll { overflow-x: auto; }
+  table.rep { width: 100%; border-collapse: collapse; font-size: var(--fs-14); }
+  table.rep th { text-align: left; font-size: var(--fs-11); letter-spacing: .04em; text-transform: uppercase;
+                 color: var(--ink-3); font-weight: 600; padding: var(--s-8) var(--s-12);
+                 border-bottom: 1px solid var(--border-strong); white-space: nowrap; }
+  table.rep td { padding: 0 var(--s-12); height: 44px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  table.rep tr:last-child td { border-bottom: 0; }
+  table.rep td.r, table.rep th.r { text-align: right; }
+  table.rep tbody tr:nth-child(even) { background: var(--surface-alt); }
+  table.rep tbody tr:hover { background: var(--accent-weak); }
+  /* status left-rule via first cell */
+  .st-cell { border-left: 3px solid transparent; padding-left: 13px !important; }
+  tr.s-ok  .st-cell { border-left-color: var(--ok-ink); }
+  tr.s-bad .st-cell { border-left-color: var(--bad-ink); }
+  tr.s-warn .st-cell { border-left-color: var(--warn-ink); }
+  .pt-name { font-size: var(--fs-15); font-weight: 500; }
+  .pt-sub { font-size: var(--fs-12); color: var(--ink-3); }
+  .cell-strong { font-weight: 500; }
+  .cell-mut { color: var(--ink-3); }
+  .flag { color: var(--warn-ink); font-size: var(--fs-13); }
+
+  /* Print / black & white demonstration (hand-styled to mimic mono laser) */
+  .paper { background: #fff; color: #000; border: 1px solid #000; border-radius: 0; padding: var(--s-16); }
+  .paper table { width: 100%; border-collapse: collapse; font-size: var(--fs-13); }
+  .paper th { text-align: left; text-transform: uppercase; font-size: 10px; letter-spacing: .04em;
+              border-bottom: 1.5px solid #000; padding: 4px 8px; }
+  .paper td { padding: 6px 8px; border-bottom: .75px solid #999; height: auto; }
+  .paper td.r { text-align: right; }
+  .paper .bw-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; }
+  .paper .bw-badge svg { width: 11px; height: 11px; }
+  .paper tr.attn td { font-weight: 600; }
+
+  /* ================= PATIENT DETAIL ================= */
+  .detail { border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); overflow: hidden; }
+  .detail-hd { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16);
+               padding: var(--s-16) var(--s-20); border-bottom: 1px solid var(--border); }
+  .detail-hd .nm { font-size: var(--fs-22); font-weight: 600; letter-spacing: -.01em; }
+  .detail-hd .sub { font-size: var(--fs-13); color: var(--ink-3); margin-top: var(--s-2); }
+  .dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-20) var(--s-24); padding: var(--s-20); }
+  .dl .k { font-size: var(--fs-11); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3);
+           font-weight: 600; margin-bottom: var(--s-4); }
+  .dl .v { font-size: var(--fs-15); font-weight: 500; }
+  .dl .v small { font-weight: 400; color: var(--ink-3); }
+  .sec-div { grid-column: 1 / -1; border-top: 1px solid var(--border); margin: var(--s-4) 0; }
+  .meter { grid-column: 1 / -1; }
+  .meter .track { height: 8px; background: var(--surface-alt); border: 1px solid var(--border);
+                  border-radius: 2px; overflow: hidden; }
+  .meter .fill { height: 100%; background: var(--ok-ink); }
+  .meter .cap { display: flex; justify-content: space-between; font-size: var(--fs-12); color: var(--ink-2);
+                margin-top: var(--s-6); }
+
+  /* ================= ADMIN QUEUE ================= */
+  .queue { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
+  .qrow { display: grid; grid-template-columns: 1fr 150px 200px 96px; align-items: center; gap: var(--s-16);
+          padding: var(--s-12) var(--s-16); border-bottom: 1px solid var(--border); }
+  .qrow:last-child { border-bottom: 0; }
+  .qrow:hover { background: var(--accent-weak); }
+  .qrow .prac { font-size: var(--fs-15); font-weight: 500; }
+  .qrow .when { font-size: var(--fs-12); color: var(--ink-3); margin-top: var(--s-2); }
+  .qcount { font-size: var(--fs-13); color: var(--ink-2); }
+  .qcount b.att { color: var(--warn-ink); }
+  .link { color: var(--accent); font-weight: 500; text-decoration: none; font-size: var(--fs-14); }
+  .link:hover { color: var(--accent-hover); text-decoration: underline; }
+  .btn { display: inline-block; font: inherit; font-size: var(--fs-13); font-weight: 500;
+         color: #fff; background: var(--accent); border: 1px solid var(--accent-hover);
+         padding: 6px 12px; border-radius: var(--r-sm); cursor: pointer; text-decoration: none; }
+  .btn:hover { background: var(--accent-hover); }
+
+  /* Appointment review row (founder working surface — denser) */
+  .review { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
+  .rvrow { display: grid; grid-template-columns: 28px 1.4fr 1.2fr 90px 1fr; align-items: center; gap: var(--s-12);
+           padding: var(--s-8) var(--s-12); border-bottom: 1px solid var(--border); font-size: var(--fs-13); }
+  .rvrow.head { background: var(--surface-alt); font-size: var(--fs-11); letter-spacing: .04em;
+                text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+  .rvrow:last-child { border-bottom: 0; }
+  .rvrow input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); }
+  .field { font-weight: 500; }
+  .field.edit { border-bottom: 1px dashed var(--border-strong); cursor: text; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: var(--fs-11); font-weight: 500;
+          padding: 2px 7px; border-radius: var(--r-sm); border: 1px solid var(--warn-bd);
+          background: var(--warn-bg); color: var(--warn-ink); }
+  .conf { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-12); color: var(--ink-3); }
+  .conf .bar { width: 40px; height: 5px; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+  .conf .bar i { display: block; height: 100%; background: var(--ink-3); }
+
+  .spec { width: 100%; border-collapse: collapse; font-size: var(--fs-13); margin-top: var(--s-12); }
+  .spec th, .spec td { text-align: left; padding: var(--s-6) var(--s-12); border-bottom: 1px solid var(--border);
+                       vertical-align: top; }
+  .spec th { font-size: var(--fs-11); text-transform: uppercase; letter-spacing: .04em; color: var(--ink-3); }
+  .spec td:first-child { font-family: var(--mono); font-size: var(--fs-12); color: var(--ink-2); white-space: nowrap; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 720px) {
+    .dl { grid-template-columns: 1fr 1fr; }
+    .qrow { grid-template-columns: 1fr auto; row-gap: var(--s-8); }
+    .rvrow { grid-template-columns: 24px 1fr 1fr; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="kicker">verifi-dental &middot; design system</div>
+    <h1>Verifi UI Kit</h1>
+    <p>Tokens and component specs for the practice-facing morning report and the internal
+       review queue. Built for a front desk scanning at a counter and a founder verifying
+       eligibility &mdash; clarity and trust over decoration.</p>
+  </header>
+
+  <!-- ============ COLOR ============ -->
+  <section>
+    <div class="eyebrow">Foundations</div>
+    <h2>Color</h2>
+    <p class="lede">Neutral greys carry the interface. One calm accent marks anything interactive,
+       and is never used to decorate. Color otherwise means exactly one thing: verification status.</p>
+
+    <h3>Neutrals</h3>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#F7F8FA"></div><div class="meta"><div class="name">bg</div><div class="hex">#F7F8FA</div><div class="role">page ground</div></div></div>
+      <div class="sw"><div class="chip" style="background:#FFFFFF"></div><div class="meta"><div class="name">surface</div><div class="hex">#FFFFFF</div><div class="role">tables, cards</div></div></div>
+      <div class="sw"><div class="chip" style="background:#F2F4F7"></div><div class="meta"><div class="name">surface-alt</div><div class="hex">#F2F4F7</div><div class="role">zebra, header fill</div></div></div>
+      <div class="sw"><div class="chip" style="background:#DFE3E8"></div><div class="meta"><div class="name">border</div><div class="hex">#DFE3E8</div><div class="role">hairlines</div></div></div>
+      <div class="sw"><div class="chip" style="background:#1A2027"></div><div class="meta"><div class="name">ink</div><div class="hex">#1A2027</div><div class="role">primary text</div></div></div>
+      <div class="sw"><div class="chip" style="background:#49525D"></div><div class="meta"><div class="name">ink-2</div><div class="hex">#49525D</div><div class="role">secondary</div></div></div>
+      <div class="sw"><div class="chip" style="background:#6B7480"></div><div class="meta"><div class="name">ink-3</div><div class="hex">#6B7480</div><div class="role">muted labels</div></div></div>
+    </div>
+
+    <h3>Accent &mdash; interactive only</h3>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#2A5C8A"></div><div class="meta"><div class="name">accent</div><div class="hex">#2A5C8A</div><div class="role">links, primary action, focus</div></div></div>
+      <div class="sw"><div class="chip" style="background:#21496E"></div><div class="meta"><div class="name">accent-hover</div><div class="hex">#21496E</div><div class="role">pressed / hover</div></div></div>
+      <div class="sw"><div class="chip" style="background:#EAF0F6"></div><div class="meta"><div class="name">accent-weak</div><div class="hex">#EAF0F6</div><div class="role">row hover, selection</div></div></div>
+    </div>
+
+    <h3>Status &mdash; meaning only</h3>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#0F7A52"></div><div class="meta"><div class="name">verified</div><div class="hex">#0F7A52</div><div class="role">7.0:1 on white</div></div></div>
+      <div class="sw"><div class="chip" style="background:#B42318"></div><div class="meta"><div class="name">issue / inactive</div><div class="hex">#B42318</div><div class="role">6.0:1 on white</div></div></div>
+      <div class="sw"><div class="chip" style="background:#B45309"></div><div class="meta"><div class="name">needs-info</div><div class="hex">#B45309</div><div class="role">4.7:1 on white</div></div></div>
+      <div class="sw"><div class="chip" style="background:#49525D"></div><div class="meta"><div class="name">not verified</div><div class="hex">#49525D</div><div class="role">neutral</div></div></div>
+    </div>
+    <div class="note">
+      <div class="lbl">Judgment call</div>
+      <p>Accent is a desaturated steel blue, not teal or violet. It reads as institutional/clinical and,
+         being low-chroma, never competes with the status colors &mdash; which is the whole point:
+         when everything neutral is grey and the only saturated things on screen are status, the eye
+         goes straight to problems.</p>
+    </div>
+  </section>
+
+  <!-- ============ TYPE ============ -->
+  <section>
+    <div class="eyebrow">Foundations</div>
+    <h2>Type</h2>
+    <p class="lede">IBM Plex Sans &mdash; engineered, legible, not trendy. IBM Plex Mono for IDs, codes,
+       and any value read digit-by-digit. Numeric columns use tabular figures so digits line up for scanning.</p>
+    <div class="panel"><div class="pad">
+      <div class="type-row"><div class="k">28 / 600</div><div style="font-size:28px;font-weight:600;letter-spacing:-.01em">Insurance Eligibility Report</div></div>
+      <div class="type-row"><div class="k">22 / 600</div><div style="font-size:22px;font-weight:600">Jane Doe</div></div>
+      <div class="type-row"><div class="k">18 / 600</div><div style="font-size:18px;font-weight:600">Section heading</div></div>
+      <div class="type-row"><div class="k">15 / 500</div><div style="font-size:15px;font-weight:500">Patient name in a report row</div></div>
+      <div class="type-row"><div class="k">14 / 400</div><div style="font-size:14px">Body and table base size</div></div>
+      <div class="type-row"><div class="k">13 / 400</div><div style="font-size:13px">Dense admin cell</div></div>
+      <div class="type-row"><div class="k">12 / 400</div><div style="font-size:12px;color:var(--ink-3)">Secondary &middot; DOB, timestamps</div></div>
+      <div class="type-row"><div class="k">11 / 600</div><div style="font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);font-weight:600">Uppercase column label</div></div>
+      <div class="type-row"><div class="k">mono 13</div><div style="font-family:var(--mono);font-size:13px">ABC-123456789 &middot; NPI 1234567890 &middot; <span class="num">$1,180.00</span></div></div>
+    </div></div>
+  </section>
+
+  <!-- ============ SPACING + RADIUS ============ -->
+  <section>
+    <div class="eyebrow">Foundations</div>
+    <h2>Spacing &amp; radius</h2>
+    <p class="lede">A 4px spacing base keeps rhythm tight and consistent. Radius tops out at 6px &mdash;
+       enough to soften a card edge, never enough to read as consumer-app playful. No pills.</p>
+    <div class="panel"><div class="pad">
+      <div class="scale">
+        <div class="u"><div class="bar" style="width:2px;height:2px"></div><span>2</span></div>
+        <div class="u"><div class="bar" style="width:4px;height:4px"></div><span>4</span></div>
+        <div class="u"><div class="bar" style="width:8px;height:8px"></div><span>8</span></div>
+        <div class="u"><div class="bar" style="width:12px;height:12px"></div><span>12</span></div>
+        <div class="u"><div class="bar" style="width:16px;height:16px"></div><span>16</span></div>
+        <div class="u"><div class="bar" style="width:20px;height:20px"></div><span>20</span></div>
+        <div class="u"><div class="bar" style="width:24px;height:24px"></div><span>24</span></div>
+        <div class="u"><div class="bar" style="width:32px;height:32px"></div><span>32</span></div>
+        <div class="u"><div class="bar" style="width:40px;height:40px"></div><span>40</span></div>
+      </div>
+      <div class="radii" style="margin-top:var(--s-24)">
+        <div class="u"><div class="r" style="border-radius:3px"></div><span style="font-family:var(--mono);font-size:11px;color:var(--ink-3)">3 &middot; chips, inputs</span></div>
+        <div class="u"><div class="r" style="border-radius:6px"></div><span style="font-family:var(--mono);font-size:11px;color:var(--ink-3)">6 &middot; cards, tables</span></div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============ STATUS BADGE ============ -->
+  <section>
+    <div class="eyebrow">Component</div>
+    <h2>Status badge</h2>
+    <p class="lede">The single most important element. Status is encoded three ways &mdash; icon shape,
+       word, and color &mdash; so it survives colorblindness and a black-and-white printout, and reads
+       in a half-second glance.</p>
+    <div class="panel"><div class="pad">
+      <div class="badge-row">
+        <span class="badge ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Active</span>
+        <span class="badge bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M7 7l10 10"/></svg>Inactive</span>
+        <span class="badge warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>Needs info</span>
+        <span class="badge mut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg>Not verified</span>
+      </div>
+    </div></div>
+    <table class="spec">
+      <thead><tr><th>Token</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>padding</td><td>3px 8px</td></tr>
+        <tr><td>radius</td><td>--r-sm (3px)</td></tr>
+        <tr><td>icon</td><td>12px, currentColor, shape unique per status</td></tr>
+        <tr><td>label</td><td>12px / 500, always present (never icon-only)</td></tr>
+        <tr><td>fill / border / text</td><td>status tint / status border / status ink</td></tr>
+      </tbody>
+    </table>
+    <div class="note trade">
+      <div class="lbl">Clean vs. scannable</div>
+      <p>A bare colored dot would be tidier and more minimal. Rejected: a dot fails the colorblind
+         ~8% of staff, vanishes in a B&amp;W print, and forces the reader to recall a legend. The chip
+         costs horizontal space and looks busier, but it self-explains at a glance. Scannability wins.</p>
+    </div>
+  </section>
+
+  <!-- ============ REPORT TABLE ROW ============ -->
+  <section>
+    <div class="eyebrow">Component</div>
+    <h2>Report table row</h2>
+    <p class="lede">The morning deliverable. A 3px status rule runs down the left of each row for
+       vertical scanning; the badge gives the explicit read. 44px rows, 15px names, tabular money.</p>
+    <div class="panel">
+      <div class="panel-cap">On screen &mdash; Bright Smiles Dental &middot; Monday, September 8, 2026</div>
+      <div class="tbl-scroll">
+        <table class="rep">
+          <thead>
+            <tr>
+              <th class="st-cell">Status</th><th>Time</th><th>Patient</th><th>Payer / Plan</th>
+              <th class="r">Annual max</th><th class="r">Remaining</th><th class="r">Deductible</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="s-ok">
+              <td class="st-cell"><span class="badge ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Active</span></td>
+              <td class="num">8:00 AM</td>
+              <td><div class="pt-name">Jane Doe</div><div class="pt-sub num">DOB 01/15/1990</div></td>
+              <td>Delta Dental<div class="pt-sub">PPO</div></td>
+              <td class="r num">$1,500.00</td><td class="r num cell-strong">$1,180.00</td><td class="r num">$50 / $50</td><td class="cell-mut">&mdash;</td>
+            </tr>
+            <tr class="s-ok">
+              <td class="st-cell"><span class="badge ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Active</span></td>
+              <td class="num">9:30 AM</td>
+              <td><div class="pt-name">Marcus Webb</div><div class="pt-sub num">DOB 07/02/1975</div></td>
+              <td>Cigna<div class="pt-sub">DHMO</div></td>
+              <td class="r num">$2,000.00</td><td class="r num cell-strong">$2,000.00</td><td class="r num">$0 / $75</td><td class="cell-mut">&mdash;</td>
+            </tr>
+            <tr class="s-bad">
+              <td class="st-cell"><span class="badge bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M7 7l10 10"/></svg>Inactive</span></td>
+              <td class="num">10:15 AM</td>
+              <td><div class="pt-name">Sofia Ramirez</div><div class="pt-sub num">DOB 03/22/2001</div></td>
+              <td>MetLife<div class="pt-sub">PPO</div></td>
+              <td class="r num cell-mut">&mdash;</td><td class="r num cell-mut">&mdash;</td><td class="r num cell-mut">&mdash;</td><td class="flag">Coverage terminated 08/31</td>
+            </tr>
+            <tr class="s-warn">
+              <td class="st-cell"><span class="badge warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>Needs info</span></td>
+              <td class="num">11:00 AM</td>
+              <td><div class="pt-name">Chen Wei</div><div class="pt-sub num">DOB 11/09/1988</div></td>
+              <td>Aetna<div class="pt-sub cell-mut">&mdash;</div></td>
+              <td class="r num cell-mut">&mdash;</td><td class="r num cell-mut">&mdash;</td><td class="r num cell-mut">&mdash;</td><td class="flag">Missing member ID &mdash; could not verify</td>
+            </tr>
+            <tr class="s-ok">
+              <td class="st-cell"><span class="badge ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Active</span></td>
+              <td class="num">1:00 PM</td>
+              <td><div class="pt-name">Robert Okonkwo</div><div class="pt-sub num">DOB 05/30/1962</div></td>
+              <td>Guardian<div class="pt-sub">PPO</div></td>
+              <td class="r num">$1,000.00</td><td class="r num cell-strong">$240.00</td><td class="r num">$100 / $100</td><td class="flag">Near annual max</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <table class="spec">
+      <thead><tr><th>Token</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>row height</td><td>44px, vertically centered</td></tr>
+        <tr><td>status rule</td><td>3px left border, status ink; transparent on verified-but-quiet rows if desired</td></tr>
+        <tr><td>zebra</td><td>even rows --surface-alt; hover --accent-weak (screen only)</td></tr>
+        <tr><td>name / DOB</td><td>15px/500 over 12px/ink-3</td></tr>
+        <tr><td>numeric cols</td><td>right-aligned, tabular-nums; remaining benefit is 500 weight (the number staff act on)</td></tr>
+        <tr><td>notes</td><td>problem notes in --warn-ink; normal notes muted</td></tr>
+      </tbody>
+    </table>
+    <div class="note trade">
+      <div class="lbl">Clean vs. scannable</div>
+      <p>Zebra striping and a colored left rule are both slightly "busier" than a pure-white table.
+         Kept, because a front desk tracks a name across eight columns and scans down for the next
+         flagged row &mdash; both cues do real work under time pressure. The compromise: striping is a
+         2-point-lightness tint, not a heavy band.</p>
+    </div>
+
+    <div class="panel" style="margin-top:var(--s-16)">
+      <div class="panel-cap">Printed &mdash; black &amp; white laser (what the front desk clips to a chart)</div>
+      <div class="pad">
+        <div class="paper">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:8px">
+            <div style="font-weight:700;font-size:15px">Insurance Eligibility Report</div>
+            <div style="font-size:12px">Bright Smiles Dental &middot; Mon, Sep 8, 2026</div>
+          </div>
+          <table>
+            <thead><tr><th>Status</th><th>Time</th><th>Patient</th><th>Payer / Plan</th><th class="r">Remaining</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td><span class="bw-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Active</span></td><td class="num">8:00 AM</td><td>Jane Doe</td><td>Delta Dental / PPO</td><td class="r num">$1,180.00</td><td>&mdash;</td></tr>
+              <tr class="attn"><td><span class="bw-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M7 7l10 10"/></svg>Inactive</span></td><td class="num">10:15 AM</td><td>Sofia Ramirez</td><td>MetLife / PPO</td><td class="r num">&mdash;</td><td>Coverage terminated 08/31</td></tr>
+              <tr class="attn"><td><span class="bw-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>Needs info</span></td><td class="num">11:00 AM</td><td>Chen Wei</td><td>Aetna</td><td class="r num">&mdash;</td><td>Missing member ID</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <div class="lbl">Print behavior</div>
+      <p>Color drops out entirely. Status survives on icon shape + word; rows needing attention set the
+         whole row to 600 weight; zebra becomes hairline rules. No information depends on color alone.</p>
+    </div>
+  </section>
+
+  <!-- ============ PATIENT DETAIL ============ -->
+  <section>
+    <div class="eyebrow">Component</div>
+    <h2>Patient detail view</h2>
+    <p class="lede">Expanded from a row when staff need the full picture before a call. Label-over-value
+       pairs in a three-column grid; the remaining-benefit meter shows headroom at a glance.</p>
+    <div class="detail">
+      <div class="detail-hd">
+        <div>
+          <div class="nm">Robert Okonkwo</div>
+          <div class="sub num">DOB 05/30/1962 &middot; Guardian PPO &middot; Member GRD-88421905</div>
+        </div>
+        <span class="badge ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Active</span>
+      </div>
+      <div class="dl">
+        <div><div class="k">Payer</div><div class="v">Guardian</div></div>
+        <div><div class="k">Plan</div><div class="v">PPO</div></div>
+        <div><div class="k">Effective</div><div class="v num">01/01/2026</div></div>
+
+        <div class="sec-div"></div>
+
+        <div><div class="k">Annual maximum</div><div class="v num">$1,000.00</div></div>
+        <div><div class="k">Remaining</div><div class="v num">$240.00</div></div>
+        <div><div class="k">Used</div><div class="v num">$760.00 <small>this year</small></div></div>
+        <div class="meter">
+          <div class="track"><div class="fill" style="width:24%"></div></div>
+          <div class="cap"><span>$240 remaining</span><span class="num">of $1,000</span></div>
+        </div>
+
+        <div class="sec-div"></div>
+
+        <div><div class="k">Deductible</div><div class="v num">$100 met <small>of $100</small></div></div>
+        <div><div class="k">Group</div><div class="v num">4471-A</div></div>
+        <div><div class="k">Subscriber</div><div class="v">Self</div></div>
+
+        <div class="sec-div"></div>
+
+        <div style="grid-column:1/-1"><div class="k">Notes</div><div class="v" style="font-weight:400">Near annual maximum &mdash; confirm remaining benefit before major work. Verified 09/07 6:42 AM by founder@verifi.</div></div>
+      </div>
+    </div>
+    <div class="note">
+      <div class="lbl">Judgment call</div>
+      <p>The benefit meter is the one piece of "data viz" allowed. It earns its place: "how much coverage
+         is left" is the question staff ask most, and a bar answers it faster than reading two numbers and
+         subtracting. Track and fill are solid (no gradient) so it prints. Everything else is plain
+         label/value &mdash; a detail view is for reading exact figures, not for charts.</p>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN QUEUE ============ -->
+  <section>
+    <div class="eyebrow">Component &mdash; internal</div>
+    <h2>Admin review queue</h2>
+    <p class="lede">The founder's surface, seen alone and focused &mdash; so it runs denser than the
+       practice report. Two rows types: the batch queue, and the per-appointment review row where
+       parsed data is corrected before verification.</p>
+
+    <h3>Batch queue row</h3>
+    <div class="queue">
+      <div class="qrow">
+        <div><div class="prac">Bright Smiles Dental</div><div class="when">Uploaded 5:02 PM &middot; tomorrow&rsquo;s schedule</div></div>
+        <div><span class="badge warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>Needs review</span></div>
+        <div class="qcount num">38 patients &middot; <b class="att">3 need review</b></div>
+        <div style="text-align:right"><a class="link" href="#">Review &rarr;</a></div>
+      </div>
+      <div class="qrow">
+        <div><div class="prac">Lakeside Family Dental</div><div class="when">Uploaded 4:48 PM &middot; tomorrow&rsquo;s schedule</div></div>
+        <div><span class="badge mut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6"/><path d="M12 16v.5"/></svg>Verifying</span></div>
+        <div class="qcount num">22 patients &middot; 22 submitted</div>
+        <div style="text-align:right"><a class="link" href="#">Open &rarr;</a></div>
+      </div>
+      <div class="qrow">
+        <div><div class="prac">Cedar Dental Group</div><div class="when">Approved 6:40 AM &middot; ready to send</div></div>
+        <div><span class="badge ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Ready</span></div>
+        <div class="qcount num">31 patients &middot; all verified</div>
+        <div style="text-align:right"><button class="btn">Send report</button></div>
+      </div>
+    </div>
+
+    <h3>Appointment review row</h3>
+    <div class="review">
+      <div class="rvrow head">
+        <div></div><div>Patient</div><div>Payer / member</div><div>Confidence</div><div>Flags</div>
+      </div>
+      <div class="rvrow">
+        <div><input type="checkbox" checked aria-label="Ready to verify"></div>
+        <div><span class="field">Jane Doe</span><div class="pt-sub num">01/15/1990</div></div>
+        <div><span class="field">Delta Dental</span><div class="pt-sub num">ABC-123456789</div></div>
+        <div><span class="conf"><span class="bar"><i style="width:100%"></i></span>100%</span></div>
+        <div class="cell-mut">&mdash;</div>
+      </div>
+      <div class="rvrow">
+        <div><input type="checkbox" aria-label="Needs correction"></div>
+        <div><span class="field">Chen Wei</span><div class="pt-sub num">11/09/1988</div></div>
+        <div><span class="field">Aetna</span><div class="pt-sub"><span class="field edit">add member ID</span></div></div>
+        <div><span class="conf"><span class="bar"><i style="width:55%"></i></span>55%</span></div>
+        <div><span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>missing member ID</span></div>
+      </div>
+      <div class="rvrow">
+        <div><input type="checkbox" aria-label="Needs correction"></div>
+        <div><span class="field edit">Sofia Ramirez</span><div class="pt-sub num">03/22/2001</div></div>
+        <div><span class="field">MetLife</span><div class="pt-sub num">MET-55021</div></div>
+        <div><span class="conf"><span class="bar"><i style="width:80%"></i></span>80%</span></div>
+        <div><span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>low-confidence name</span></div>
+      </div>
+    </div>
+    <table class="spec">
+      <thead><tr><th>Token</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>row height</td><td>~36px (denser than the 44px report row)</td></tr>
+        <tr><td>editable field</td><td>dashed underline (--border-strong) signals inline edit</td></tr>
+        <tr><td>missing-field chip</td><td>--warn tokens, icon + exact field named</td></tr>
+        <tr><td>confidence</td><td>mono %, 40px meter in --ink-3 (neutral — confidence is not a status)</td></tr>
+        <tr><td>primary action</td><td>accent button only on the terminal step (Send report)</td></tr>
+      </tbody>
+    </table>
+    <div class="note trade">
+      <div class="lbl">Why denser here</div>
+      <p>The report is read across a counter in seconds; the queue is worked head-down by one person.
+         So the report gets 44px rows and 15px names, the queue gets 36px and 13px. Same tokens, different
+         density &mdash; the type scale and color system don't change, only the rhythm does.</p>
+    </div>
+    <div class="note trade">
+      <div class="lbl">Confidence is deliberately grey</div>
+      <p>Parse confidence uses the neutral --ink-3 meter, not amber/red. It's a hint about the OCR/parse,
+         not a clinical status &mdash; coloring it with status hues would dilute the one thing status color
+         is allowed to mean. The amber chip, not the meter, is what flags a row for action.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Summary</div>
+    <h2>Where clean traded off against scannable</h2>
+    <table class="spec">
+      <thead><tr><th>Decision</th><th>Call</th></tr></thead>
+      <tbody>
+        <tr><td>Status chip vs. dot</td><td>Chip. Busier, but survives colorblindness + B&amp;W and needs no legend.</td></tr>
+        <tr><td>Zebra + left rule</td><td>Kept, subtle. Real aid to tracking rows/columns under time pressure.</td></tr>
+        <tr><td>Row height 44 vs 36</td><td>44 for the counter-read report, 36 for the head-down admin queue.</td></tr>
+        <tr><td>Benefit meter</td><td>The one chart allowed &mdash; answers the most-asked question faster than digits.</td></tr>
+        <tr><td>Accent restraint</td><td>Steel blue on interactive only; status is the only other saturation on screen.</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>

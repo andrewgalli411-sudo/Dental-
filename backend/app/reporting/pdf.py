@@ -63,7 +63,7 @@ def render_pdf(data: ReportData) -> bytes:
     # Header row.
     pdf.set_font("Helvetica", "B", 8)
     pdf.set_text_color(255, 255, 255)
-    pdf.set_fill_color(14, 116, 144)
+    pdf.set_fill_color(26, 32, 39)  # --ink; neutral header, no decorative color
     for title, width, align in _COLUMNS:
         pdf.cell(width, 7, title, border=0, align=align, fill=True)
     pdf.ln(7)
