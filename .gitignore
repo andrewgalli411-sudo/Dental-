@@ -30,3 +30,5 @@ yarn-error.log*
 *.sqlite3
 *.db
 /tmp/
+_local_object_store/
+backend/_local_object_store/

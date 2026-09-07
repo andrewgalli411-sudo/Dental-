@@ -32,10 +32,12 @@ class Appointment(Base, TimestampMixin):
         DateTime(timezone=True), nullable=True
     )
 
-    # Required minimum (v1 contract).
-    patient_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    dob: Mapped[date] = mapped_column(Date, nullable=False)
-    payer_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    # Required minimum for verification (name + dob + payer). Nullable at the DB
+    # level so imperfect parses can be STAGED for admin review/correction; their
+    # presence is enforced before a verification is submitted, not by the schema.
+    patient_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    dob: Mapped[date | None] = mapped_column(Date, nullable=True)
+    payer_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # Optional identifiers (missing -> chase-work; needed for EDI 270 in v2).
     subscriber_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
@@ -49,6 +51,11 @@ class Appointment(Base, TimestampMixin):
     needs_review: Mapped[bool] = mapped_column(
         Boolean, default=True, nullable=False
     )
+
+    @property
+    def has_required_identity(self) -> bool:
+        """True once the row has the v1 minimum needed to verify eligibility."""
+        return bool(self.patient_name and self.dob and self.payer_name)
 
     batch: Mapped[Batch] = relationship(back_populates="appointments")
     verification: Mapped[Verification | None] = relationship(

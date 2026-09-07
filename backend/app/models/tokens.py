@@ -9,7 +9,7 @@ read never yields a working link.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -40,4 +40,10 @@ class AccessToken(Base, TimestampMixin):
     )
 
     def is_usable(self, now: datetime) -> bool:
-        return self.used_at is None and now < self.expires_at
+        # Some DB backends (e.g. SQLite) return naive datetimes even for
+        # timezone-aware columns. Treat a naive stored value as UTC so the
+        # comparison never mixes aware/naive.
+        expires = self.expires_at
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=UTC)
+        return self.used_at is None and now < expires

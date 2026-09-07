@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
+from .api import upload
 from .config import get_settings
 from .logging_config import configure_logging, get_logger
 
@@ -21,6 +22,9 @@ app = FastAPI(
     version="0.1.0",
     description="Dental eligibility verification (wizard-of-oz v1).",
 )
+
+
+app.include_router(upload.router)
 
 
 @app.get("/healthz")
