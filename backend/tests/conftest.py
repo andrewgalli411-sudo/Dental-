@@ -40,6 +40,7 @@ def client(session_factory, tmp_path):
 
     from app.db import get_session
     from app.main import app
+    from app.notifications import LocalEmailSender, get_email_sender
     from app.storage import LocalObjectStore, get_object_store
 
     def _override_session():
@@ -50,9 +51,13 @@ def client(session_factory, tmp_path):
             s.close()
 
     store = LocalObjectStore(tmp_path / "obj")
+    email_sender = LocalEmailSender()
     app.dependency_overrides[get_session] = _override_session
     app.dependency_overrides[get_object_store] = lambda: store
-    yield TestClient(app)
+    app.dependency_overrides[get_email_sender] = lambda: email_sender
+    tc = TestClient(app)
+    tc.email_sender = email_sender  # test hook: inspect the outbox
+    yield tc
     app.dependency_overrides.clear()
 
 

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eligibility Report — {{ data.practice_name }}</title>
+<style>
+  :root {
+    --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --bg: #f8fafc;
+    --ok: #047857; --ok-bg: #ecfdf5; --warn: #b45309; --warn-bg: #fffbeb;
+    --bad: #b91c1c; --bad-bg: #fef2f2; --brand: #0e7490;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .sheet { max-width: 1100px; margin: 24px auto; background: #fff; padding: 32px 36px;
+           border: 1px solid var(--line); border-radius: 12px; }
+  header { display: flex; justify-content: space-between; align-items: baseline;
+           border-bottom: 2px solid var(--brand); padding-bottom: 16px; margin-bottom: 20px; }
+  h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
+  .practice { font-size: 15px; color: var(--muted); margin-top: 2px; }
+  .meta { text-align: right; color: var(--muted); font-size: 13px; }
+  .summary { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat { flex: 1; min-width: 130px; border: 1px solid var(--line); border-radius: 10px;
+          padding: 12px 14px; }
+  .stat .n { font-size: 22px; font-weight: 650; }
+  .stat .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+       color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px;
+          font-weight: 600; }
+  .pill.active { color: var(--ok); background: var(--ok-bg); }
+  .pill.inactive { color: var(--bad); background: var(--bad-bg); }
+  .pill.other { color: var(--warn); background: var(--warn-bg); }
+  .note { color: var(--warn); font-size: 12.5px; }
+  .name { font-weight: 600; }
+  .sub { color: var(--muted); font-size: 12px; }
+  footer { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line);
+           color: var(--muted); font-size: 12px; }
+  @media print {
+    body { background: #fff; }
+    .sheet { border: none; margin: 0; max-width: none; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header>
+    <div>
+      <h1>Insurance Eligibility Report</h1>
+      <div class="practice">{{ data.practice_name }}</div>
+    </div>
+    <div class="meta">
+      <div><strong>{{ data.generated_at }}</strong></div>
+      <div>{{ data.rows|length }} appointments</div>
+    </div>
+  </header>
+
+  <div class="summary">
+    <div class="stat"><div class="n">{{ data.rows|length }}</div><div class="l">Patients</div></div>
+    <div class="stat"><div class="n">{{ data.verified_count }}</div><div class="l">Verified</div></div>
+    <div class="stat"><div class="n">{{ data.unverified_count }}</div><div class="l">Needs attention</div></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th><th>Patient</th><th>Payer / Plan</th><th>Status</th>
+        <th class="num">Annual max</th><th class="num">Remaining</th>
+        <th class="num">Deductible</th><th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in data.rows %}
+      <tr>
+        <td>{{ r.appt_time or "—" }}</td>
+        <td>
+          <div class="name">{{ r.patient_name }}</div>
+          {% if r.dob %}<div class="sub">DOB {{ r.dob.strftime("%m/%d/%Y") }}</div>{% endif %}
+        </td>
+        <td>{{ r.payer or "—" }}{% if r.plan %}<div class="sub">{{ r.plan }}</div>{% endif %}</td>
+        <td>
+          {% if r.status == "active" %}<span class="pill active">Active</span>
+          {% elif r.status == "inactive" %}<span class="pill inactive">Inactive</span>
+          {% else %}<span class="pill other">{{ r.status|replace("_", " ")|title }}</span>{% endif %}
+        </td>
+        <td class="num">{{ r.annual_max|money }}</td>
+        <td class="num">{{ r.remaining_benefit|money }}</td>
+        <td class="num">
+          {% if r.deductible_total is not none %}
+            {{ r.deductible_met|money }} / {{ r.deductible_total|money }}
+          {% else %}—{% endif %}
+        </td>
+        <td>{% if not r.verified and r.note %}<span class="note">{{ r.note }}</span>{% else %}{{ r.note or "" }}{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <footer>
+    Verified by verifi-dental. Confirm coverage at time of service; benefits quoted
+    are not a guarantee of payment. Contains PHI — handle per your practice's HIPAA policy.
+  </footer>
+</div>
+</body>
+</html>

@@ -21,6 +21,7 @@ from app.db import get_session
 from app.eligibility.types import VerificationStatus
 from app.models import AdminUser, Appointment, Batch, Practice
 from app.models.enums import BatchStatus
+from app.notifications import EmailSender, get_email_sender
 from app.security.auth import (
     SESSION_COOKIE,
     issue_session,
@@ -28,8 +29,9 @@ from app.security.auth import (
     verify_password,
     verify_totp,
 )
-from app.services import verification_service
+from app.services import delivery_service, verification_service
 from app.services.verification_service import WorkflowError
+from app.storage import ObjectStore, get_object_store
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -260,3 +262,26 @@ def approve_batch(
     except WorkflowError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     return ApproveResponse(report_id=str(report_id))
+
+
+class SendResponse(BaseModel):
+    report_url: str
+    purge_at: str
+
+
+@router.post("/batches/{batch_id}/send", response_model=SendResponse)
+def send_report(
+    batch_id: uuid.UUID,
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
+    admin: AdminUser = Depends(require_admin),
+    store: ObjectStore = Depends(get_object_store),
+    email_sender: EmailSender = Depends(get_email_sender),
+) -> SendResponse:
+    try:
+        result = delivery_service.send_report(
+            session, batch_id, store, email_sender, settings, admin.email
+        )
+    except WorkflowError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    return SendResponse(report_url=result.report_url, purge_at=result.purge_at.isoformat())
