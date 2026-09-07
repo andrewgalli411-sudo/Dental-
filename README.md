@@ -60,5 +60,12 @@ Frontend (Next.js) is added in Phase 2 (`frontend/`).
 
 ## Status
 
-Phase 1 (data model + eligibility abstraction + skeleton). Not production-ready;
-no infra, no auth, no real endpoints yet. See the build plan for phasing.
+All codeable v1 phases complete (1–5): intake + normalization, admin auth + MFA +
+verification queue, human sign-off, report HTML/PDF + secure-link delivery, and
+7-day PHI purge. Behind adapters (storage/OCR/email/eligibility) so real AWS drops
+in at Phase 0. 32 tests passing.
+
+**Not yet production-ready — Phase 0 is on the founder:** real AWS infra
+(RDS/S3/KMS/SES/Textract), signed BAAs (AWS; Anthropic only if an LLM ever touches
+PHI), secrets, deploy, and a Next.js frontend if desired (the API is ready for one).
+Flip this repo **private** before any real credentials or PHI. See `CLAUDE.md`.

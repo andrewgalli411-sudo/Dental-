@@ -57,6 +57,7 @@ def client(session_factory, tmp_path):
     app.dependency_overrides[get_email_sender] = lambda: email_sender
     tc = TestClient(app)
     tc.email_sender = email_sender  # test hook: inspect the outbox
+    tc.object_store = store  # test hook: assert on stored/deleted objects
     yield tc
     app.dependency_overrides.clear()
 

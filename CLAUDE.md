@@ -72,16 +72,25 @@ alembic upgrade head # needs a live Postgres DATABASE_URL
 
 - **Phase 0** (founder actions, mostly not codeable): AWS account, RDS/S3/KMS,
   SES, Secrets Manager; AWS BAA; Anthropic BAA decision.
-- **Phase 1 (DONE, this scaffold):** data model, eligibility abstraction,
-  PHI-scrubbing logger, FastAPI skeleton, migration, contract tests.
-- **Phase 2:** secure upload link + normalizer (CSV/Excel deterministic;
-  PDF/image via Textract) → reviewable appointment rows.
-- **Phase 3:** admin auth (single user, TOTP MFA) + review/verification queue +
-  approve.
-- **Phase 4:** report web page + PDF + SES secure-link delivery.
-- **Phase 5:** 7-day PHI purge job, audit wiring, backups/alarms.
+- **Phase 1 (DONE):** data model, eligibility abstraction, PHI-scrubbing logger,
+  FastAPI skeleton, migration, contract tests.
+- **Phase 2 (DONE):** secure token upload (POST /upload/{token}) + normalizer
+  (CsvExcelParser deterministic; TextractParser adapter for PDF/image) →
+  reviewable appointment rows. app/storage, app/intake, app/security/tokens.
+- **Phase 3 (DONE):** admin auth (argon2 + mandatory TOTP MFA, signed cookie) +
+  review/verification queue + human sign-off. app/security/auth,
+  app/persistence (SqlVerificationStore), app/services/verification_service,
+  app/api/admin. Bootstrap: scripts/create_admin.
+- **Phase 4 (DONE):** report HTML + PDF (app/reporting) + SES secure-link
+  delivery (app/notifications, app/services/delivery_service, app/api/report).
+- **Phase 5 (DONE):** 7-day PHI purge (app/services/purge_service,
+  scripts/purge_phi) — deletes appointment/verification rows, raw files, and the
+  report PDF; keeps non-PHI metadata + audit. Audit wired on admin + purge actions.
 
-Do NOT scaffold features beyond the current agreed phase.
+Codeable v1 phases are complete. Remaining before pilot is Phase 0 (founder):
+real AWS infra (RDS/S3/KMS/SES/Textract), BAAs (AWS + Anthropic if ever used),
+env/secrets, deploy, and a Next.js frontend if desired (API is ready for it).
+Do NOT scaffold features beyond agreed scope.
 
 ## Pushing this repo (first push)
 
