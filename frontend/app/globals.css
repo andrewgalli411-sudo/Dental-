@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+
+body {
+  background: #f7f8fa;
+  color: #1a2027;
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.num { font-variant-numeric: tabular-nums; }
+
+/* Visible keyboard focus everywhere. */
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid #2a5c8a;
+  outline-offset: 2px;
+}
