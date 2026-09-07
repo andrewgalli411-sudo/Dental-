@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>verifi-dental — Insurance eligibility, verified before they arrive</title>
+<meta name="description" content="verifi-dental verifies every patient's dental insurance before their appointment, so your front desk stops losing hours on hold and your practice stops eating denied claims.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --bg:#F7F8FA; --surface:#FFFFFF; --surface-alt:#F2F4F7;
+    --border:#DFE3E8; --border-strong:#C3C9D2;
+    --ink:#1A2027; --ink-2:#49525D; --ink-3:#6B7480;
+    --accent:#2A5C8A; --accent-hover:#21496E; --accent-weak:#EAF0F6;
+    --ok-ink:#0F7A52; --ok-bg:#E7F4EE; --ok-bd:#BFE3D0;
+    --bad-ink:#B42318; --warn-ink:#B45309; --warn-bg:#FDF3E7; --warn-bd:#F5D9B0;
+    --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+    /* Set this to your deployed app (AWS), e.g. https://app.verifidental.com */
+    --app-url:'#';
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;
+       padding:10px 18px;border-radius:6px;text-decoration:none;border:1px solid transparent;}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent-hover);}
+  .btn.primary:hover{background:var(--accent-hover);}
+  .btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--border-strong);}
+  .btn.ghost:hover{background:var(--surface-alt);}
+
+  /* Header */
+  header.nav{border-bottom:1px solid var(--border);background:var(--surface);}
+  .nav .row{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .brand{font-weight:600;font-size:18px;letter-spacing:-.01em;}
+  .brand .mono{font-family:var(--mono);color:var(--accent);}
+  .nav-links{display:flex;align-items:center;gap:24px;}
+  .nav-links a{font-size:14px;color:var(--ink-2);text-decoration:none;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cta{display:flex;align-items:center;gap:12px;}
+
+  /* Hero */
+  .hero{padding:72px 0 56px;}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);}
+  h1{font-size:44px;line-height:1.1;letter-spacing:-.02em;font-weight:600;margin:14px 0 0;max-width:16ch;text-wrap:balance;}
+  .sub{font-size:19px;color:var(--ink-2);margin:18px 0 0;max-width:56ch;}
+  .hero-cta{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+  .hero-note{font-size:13px;color:var(--ink-3);margin-top:14px;}
+
+  /* Sample card in hero */
+  .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;}
+  .mock{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04);}
+  .mock .cap{font-size:12px;color:var(--ink-3);padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface-alt);font-weight:500;}
+  .mock table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .mock th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--border-strong);}
+  .mock td{padding:0 12px;height:40px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  .mock tr:last-child td{border-bottom:0;}
+  .mock td.r{text-align:right;font-variant-numeric:tabular-nums;}
+  .mock tr.a td{border-left:3px solid var(--ok-ink);}
+  .mock tr.a td:first-child{padding-left:9px;}
+  .mock tr.b td{border-left:3px solid var(--bad-ink);}
+  .mock tr.b td:first-child{padding-left:9px;}
+  .mock tr.w td{border-left:3px solid var(--warn-ink);}
+  .mock tr.w td:first-child{padding-left:9px;}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:2px 7px;border-radius:3px;border:1px solid;}
+  .pill.ok{color:var(--ok-ink);background:var(--ok-bg);border-color:var(--ok-bd);}
+  .pill.bad{color:var(--bad-ink);background:#FCEBEA;border-color:#F4C6C2;}
+  .pill.warn{color:var(--warn-ink);background:var(--warn-bg);border-color:var(--warn-bd);}
+  .pill svg{width:11px;height:11px;}
+
+  /* Sections */
+  section.band{padding:56px 0;border-top:1px solid var(--border);}
+  section.band.alt{background:var(--surface);}
+  h2{font-size:28px;letter-spacing:-.01em;font-weight:600;margin:0 0 8px;text-wrap:balance;}
+  .lede{font-size:17px;color:var(--ink-2);max-width:60ch;margin:0 0 28px;}
+
+  .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:22px;}
+  section.alt .card{background:var(--bg);}
+  .step-n{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500;}
+  .card h3{font-size:17px;font-weight:600;margin:10px 0 6px;}
+  .card p{font-size:14.5px;color:var(--ink-2);margin:0;}
+
+  .problem{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:22px;}
+  section.alt .stat{background:var(--bg);}
+  .stat .big{font-size:32px;font-weight:600;letter-spacing:-.01em;}
+  .stat .lbl{font-size:14px;color:var(--ink-2);margin-top:4px;}
+
+  .trust{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;}
+  .trust .t{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2);
+            background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;}
+  section.alt .trust .t{background:var(--bg);}
+  .trust svg{width:16px;height:16px;color:var(--ok-ink);flex:none;}
+
+  .cta-band{padding:64px 0;text-align:center;border-top:1px solid var(--border);background:var(--surface);}
+  .cta-band h2{margin-bottom:6px;}
+  .cta-band .lede{margin:0 auto 24px;}
+
+  footer{border-top:1px solid var(--border);padding:28px 0;color:var(--ink-3);font-size:13px;}
+  footer .row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+
+  @media (max-width:820px){
+    .hero-grid{grid-template-columns:1fr;} h1{font-size:34px;}
+    .cols3{grid-template-columns:1fr;} .problem{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+  }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap row">
+    <div class="brand">verifi<span class="mono">-dental</span></div>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#report">The report</a>
+      <a href="#trust">Security</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn ghost" id="signin-top" href="#">Sign in</a>
+      <a class="btn primary" href="#pilot">Request a pilot</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Dental insurance eligibility, automated</div>
+        <h1>Know every patient&rsquo;s coverage before they walk in.</h1>
+        <p class="sub">Send us tomorrow&rsquo;s schedule. We verify each patient&rsquo;s active coverage,
+           remaining benefit, and deductible &mdash; and your front desk gets one clean report before the
+           first appointment. No more hours on hold. No more denied claims you eat.</p>
+        <div class="hero-cta">
+          <a class="btn primary" href="#pilot">Request a pilot</a>
+          <a class="btn ghost" id="signin-hero" href="#">Sign in</a>
+        </div>
+        <p class="hero-note">Built for independent, single-location practices. HIPAA-aware from day one.</p>
+      </div>
+      <div class="mock" aria-hidden="true">
+        <div class="cap">Tomorrow &middot; Bright Smiles Dental</div>
+        <table>
+          <thead><tr><th>Patient</th><th>Payer</th><th class="r">Remaining</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr class="a"><td>Jane D.</td><td>Delta Dental</td><td class="r">$1,180</td>
+              <td><span class="pill ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Active</span></td></tr>
+            <tr class="a"><td>Marcus W.</td><td>Cigna</td><td class="r">$2,000</td>
+              <td><span class="pill ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Active</span></td></tr>
+            <tr class="b"><td>Sofia R.</td><td>MetLife</td><td class="r">&mdash;</td>
+              <td><span class="pill bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M7 7l10 10"/></svg>Inactive</span></td></tr>
+            <tr class="w"><td>Chen W.</td><td>Aetna</td><td class="r">&mdash;</td>
+              <td><span class="pill warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>Needs info</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt" id="problem">
+    <div class="wrap">
+      <h2>The morning insurance scramble costs you real money.</h2>
+      <p class="lede">Every unverified patient is a coin flip. Skip the check and a denied claim lands
+         weeks later &mdash; and the practice, not the patient, usually eats it.</p>
+      <div class="problem">
+        <div class="stat"><div class="big">2&ndash;3 hrs/day</div><div class="lbl">Front-desk time lost to payer hold lines and portal logins.</div></div>
+        <div class="stat"><div class="big">5&ndash;10%</div><div class="lbl">of dental claims are denied &mdash; a large share for eligibility issues that were checkable in advance.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="how">
+    <div class="wrap">
+      <h2>How it works</h2>
+      <p class="lede">No new software for your staff to learn. You already make the schedule &mdash;
+         we do the rest.</p>
+      <div class="cols3">
+        <div class="card"><div class="step-n">Step 1</div><h3>Send your schedule</h3><p>Upload tomorrow&rsquo;s appointment list through a secure link &mdash; any format, CSV to PDF. Takes about a minute.</p></div>
+        <div class="card"><div class="step-n">Step 2</div><h3>We verify overnight</h3><p>Each patient&rsquo;s coverage, remaining benefit, and deductible are checked and reviewed by a human before anything is sent.</p></div>
+        <div class="card"><div class="step-n">Step 3</div><h3>Read it with coffee</h3><p>One clean report &mdash; web and printable &mdash; in your inbox before the first patient arrives.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt" id="report">
+    <div class="wrap">
+      <h2>A report your front desk can read in five seconds.</h2>
+      <p class="lede">Verified, inactive, or needs-attention &mdash; distinguishable at a glance, by
+         shape and label, not just color. Prints clean in black and white for the chart.</p>
+      <div class="cols3">
+        <div class="card"><h3>Active coverage</h3><p>Payer, plan, effective date &mdash; confirmed active, so you can seat the patient with confidence.</p></div>
+        <div class="card"><h3>Remaining benefit &amp; deductible</h3><p>Annual maximum, what&rsquo;s left, and deductible met &mdash; the numbers your treatment plan depends on.</p></div>
+        <div class="card"><h3>Problems, flagged early</h3><p>Terminated coverage or missing info surfaced the night before &mdash; not discovered at the counter.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="trust">
+    <div class="wrap">
+      <h2>Built for patient data from the first line of code.</h2>
+      <p class="lede">This is protected health information, and it is treated that way &mdash; not bolted on later.</p>
+      <div class="trust">
+        <div class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7z"/><path d="M9 12l2 2 4-4"/></svg>Encrypted in transit &amp; at rest</div>
+        <div class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7z"/></svg>BAA available</div>
+        <div class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Patient data purged after 7 days</div>
+        <div class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Human sign-off on every report</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band" id="pilot">
+    <div class="wrap">
+      <h2>Run a free pilot on tomorrow&rsquo;s schedule.</h2>
+      <p class="lede">Send us one day of appointments. See the report before your practice opens.
+         If it doesn&rsquo;t save your front desk real time, you&rsquo;ve lost nothing.</p>
+      <a class="btn primary" href="mailto:hello@verifidental.com?subject=Pilot%20request">Request a pilot</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <div>&copy; 2026 verifi-dental. For dental practices in the United States.</div>
+    <div>Not affiliated with any insurance payer. Benefits quoted are not a guarantee of payment.</div>
+  </div>
+</footer>
+
+<script>
+  // Point every "Sign in" link at the deployed app (AWS). Set NEXT_APP_URL at
+  // deploy time, or replace the fallback below with your app URL.
+  var APP_URL = "REPLACE_WITH_APP_URL"; // e.g. https://app.verifidental.com/login
+  if (APP_URL && APP_URL.indexOf("http") === 0) {
+    document.getElementById("signin-top").href = APP_URL;
+    document.getElementById("signin-hero").href = APP_URL;
+  }
+</script>
+</body>
+</html>
